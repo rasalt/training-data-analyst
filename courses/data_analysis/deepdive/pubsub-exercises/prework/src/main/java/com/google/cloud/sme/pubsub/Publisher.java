@@ -18,17 +18,30 @@ package com.google.cloud.sme.pubsub;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.sme.common.ActionUtils;
 import com.google.cloud.sme.Entities;
+import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.ProjectTopicName;
-
+import java.io.*;
 /** A basic Pub/Sub publisher for purposes of demonstrating use of the API. */
 public class Publisher {
-
+  com.google.cloud.pubsub.v1.Publisher pub;
   /** Creates a new publisher associated with the given project and topic. */
   public Publisher(String project, String topic) {
+     try {
+        ProjectTopicName topicName = ProjectTopicName.of(project, topic);
+        pub = com.google.cloud.pubsub.v1.Publisher.newBuilder(topicName).build();
+     } 
+     catch(IOException e) {
+	       e.printStackTrace();
+     }
   }
 
   /** Publishes the action on the topic associated with this publisher. */
   public void publish(Entities.Action action) {
+        ByteString data = ActionUtils.encodeActionAsJson(action);
+        String str = data.toStringUtf8();	
+        System.out.println("published" + str);
+	PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
+        ApiFuture<String> future = pub.publish(pubsubMessage);
   }
 }

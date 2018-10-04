@@ -71,6 +71,7 @@ public class Example {
       ActionReader actionReader = new FileActionReader(parsedArgs.inputFile);
       Publisher publisher = new Publisher(parsedArgs.project, parsedArgs.topic);
       Entities.Action nextAction = actionReader.next();
+      System.out.println("Next Action:" + ActionUtils.encodeAction(nextAction) );
       int remaining = parsedArgs.messageCount;
       while (nextAction != null && remaining > 0) {
         publisher.publish(nextAction);
